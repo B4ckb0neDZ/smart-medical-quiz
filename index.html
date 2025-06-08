@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Smart Medical Quiz</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="header">
+        <h1>Smart Medical Quiz</h1>
+    </div>
+
+    <div class="container">
+        <div id="question-box"></div>
+        <div id="options-box"></div>
+        <button id="next-btn" disabled>Question suivante</button>
+        <div id="feedback"></div>
+
+        <div class="progress-section">
+            <label>Progression</label>
+            <div class="progress-bar-container">
+                <div id="progress-bar"></div>
+                <div id="progress-bubble"></div>
+            </div>
+            <div id="progress-percent"></div>
+        </div>
+    </div>
+
+    <script>
+        let questions = [];
+        let currentQuestionIndex = 0;
+        let correctCount = 0;
+        let wrongCount = 0;
+
+        fetch("questions.csv")
+            .then(res => res.text())
+            .then(data => {
+                const lines = data.trim().split("\n").slice(1);
+                questions = lines.map(line => {
+                    const [q, o1, o2, o3, o4, correct, exp] = line.split(",");
+                    return {
+                        question: q,
+                        options: [o1, o2, o3, o4],
+                        correct: correct,
+                        explanation: exp
+                    };
+                });
+                showQuestion();
+            });
+
+        function showQuestion() {
+            const q = questions[currentQuestionIndex];
+            document.getElementById("question-box").textContent = q.question;
+            const optionsBox = document.getElementById("options-box");
+            optionsBox.innerHTML = "";
+            const colors = ["#FFD36B", "#7BC9FF", "#FDC5F5", "#C3F584"];
+            q.options.forEach((opt, index) => {
+                const btn = document.createElement("button");
+                btn.textContent = opt;
+                btn.className = "option";
+                btn.style.backgroundColor = colors[index % colors.length];
+                btn.onclick = () => selectAnswer(opt);
+                optionsBox.appendChild(btn);
+            });
+            document.getElementById("feedback").innerHTML = "";
+            document.getElementById("next-btn").disabled = true;
+        }
+
+        function selectAnswer(selected) {
+            const q = questions[currentQuestionIndex];
+            const feedback = document.getElementById("feedback");
+            if (selected === q.correct) {
+                correctCount++;
+                feedback.innerHTML = "<p><strong>Bonne réponse !</strong></p><p>" + q.explanation + "</p>";
+            } else {
+                wrongCount++;
+                feedback.innerHTML = "<p><strong>Mauvaise réponse.</strong></p><p>" + q.explanation + "</p>";
+            }
+            document.getElementById("next-btn").disabled = false;
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const total = questions.length;
+            const current = currentQuestionIndex + 1;
+            const percent = Math.round((current / total) * 100);
+            const bar = document.getElementById("progress-bar");
+            const bubble = document.getElementById("progress-bubble");
+            bar.style.width = percent + "%";
+            bubble.style.left = `calc(${percent}% - 10px)`;
+            document.getElementById("progress-percent").textContent = percent + "% terminé";
+        }
+
+        document.getElementById("next-btn").onclick = () => {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                showQuestion();
+            } else {
+                document.getElementById("quiz-container").innerHTML = "<p>Quiz terminé. Merci pour votre participation !</p>";
+                document.getElementById("feedback").innerHTML = "";
+            }
+        };
+    </script>
+</body>
+</html>
