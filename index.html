@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Smart Medical Quiz - Debug</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+    <h1>Smart Medical Quiz - Debug</h1>
+    <div id="quiz-container">
+        <div id="question-box"></div>
+        <div id="options-box"></div>
+        <button id="next-btn" disabled>Question suivante</button>
+    </div>
+    <div id="feedback"></div>
+    <div id="stats"></div>
+    <hr>
+    <button onclick="testCSV()">🔍 Tester le chargement CSV</button>
+    <button onclick="testJS()">🧪 Tester le moteur JS</button>
+    <button onclick="forcerPremiereQuestion()">📤 Forcer affichage question 1</button>
+    <pre id="debug-log" style="margin-top:20px; background:#eee; padding:1em;"></pre>
+</div>
+<script src="script.js"></script>
+</body>
+</html>
